@@ -1,8 +1,11 @@
+:<<EOF
+这个脚本用来输出目录中所有的文件名，输出格式是：深度为i的文件的名字将被i次（tab）缩进后打印出来。
+EOF
 #!/bin/bash
 function fullpath(){
 	cd $1
 	local pre_path=$(pwd)
-	cd -
+	cd ->/dev/null
 	for name in $(ls $1)
 	do
 		echo $pre_path"/"$name
