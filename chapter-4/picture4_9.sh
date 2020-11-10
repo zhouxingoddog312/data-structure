@@ -1,3 +1,6 @@
+:<<EOF
+后序遍历计算目录大小
+EOF
 #!/bin/bash
 function fullpath(){
 	cd $1
@@ -9,8 +12,8 @@ function fullpath(){
 	done
 }
 function SizeDirectory(){
-	local declare -i filesize=0
-	local declare -i TotalSize=0
+	local filesize=0
+	local TotalSize=0
 	if [ -f $1 ] || [ -d $1 ]
 	then
 		filesize=`ls -ld $1|cut -d ' ' -f 5`
@@ -19,11 +22,12 @@ function SizeDirectory(){
 		then
 			for child in $(fullpath $1)
 			do
-				let TotalSize+=$(SizeDirectory $child)
+				filesize=$(SizeDirectory $child)
+				let TotalSize+=filesize
 			done
 		fi
 	fi
-	return $TotalSize
+	echo $TotalSize
 }
 result=`SizeDirectory $1`
 echo $result
