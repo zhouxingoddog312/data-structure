@@ -18,6 +18,10 @@ static void Error(char *S)
 	puts(S);
 }
 
+SearchTree Init(SearchTree T)
+{
+	return NULL;
+}
 SearchTree MakeEmpty(SearchTree T)
 {
 	if(T!=NULL)
@@ -35,13 +39,14 @@ Position Find(ElementType X,SearchTree T)
 	if(P!=NULL)
 	{
 		if(P->Element<X)
-			Find(X,P->Right);
+			return Find(X,P->Right);
 		else if(P->Element>X)
-			Find(X,P->Left);
+			return Find(X,P->Left);
 		else
 			return P;
 	}
-	return P;
+	else
+		return P;
 }
 
 Position FindMin(SearchTree T)

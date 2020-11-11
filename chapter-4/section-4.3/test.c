@@ -4,6 +4,7 @@ int main(void)
 {
 	Position P;
 	SearchTree T;
+	T=Init(T);
 	T=MakeEmpty(T);
 	T=Insert(4,T);
 	T=Insert(2,T);

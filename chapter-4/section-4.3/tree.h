@@ -5,6 +5,7 @@ typedef struct TreeNode *Position;
 typedef struct TreeNode *SearchTree;
 typedef int ElementType;
 
+SearchTree Init(SearchTree T);
 SearchTree MakeEmpty(SearchTree T);
 Position Find(ElementType X,SearchTree T);
 Position FindMin(SearchTree T);
