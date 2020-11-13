@@ -60,8 +60,8 @@ static Position SingleRotateWithLeft(Position K2)
 	K1=K2->Left;
 	K2->Left=K1->Right;
 	K1->Right=K2;
-	K2->Height=Max(Height(K2->Left),Height(K2->Right))+1;
-	K1->Height=Max(Height(K1->Left),Height(K1->Right))+1;
+	K2->Height=Max(CatchHeight(K2->Left),CatchHeight(K2->Right))+1;
+	K1->Height=Max(CatchHeight(K1->Left),CatchHeight(K1->Right))+1;
 	return K1;
 }
 static Position SingleRotateWithRight(Position K1)
@@ -70,12 +70,113 @@ static Position SingleRotateWithRight(Position K1)
 	K2=K1->Right;
 	K1->Right=K2->Left;
 	K2->Left=K1;
-	K1->Height=Max(Height(K1->Left),Height(K1->Right))+1;
-	K2->Height=Max(Height(K2->Left),Height(K2->Right))+1;
+	K1->Height=Max(CatchHeight(K1->Left),CatchHeight(K1->Right))+1;
+	K2->Height=Max(CatchHeight(K2->Left),CatchHeight(K2->Right))+1;
 	return K2;
 }
 
 static Position DoubleRotateWithLeft(Position K3)
 {
+	K3->Left=SingleRotateWithRight(K3->Left);
+	return SingleRotateWithLeft(K3);
+}
+static Position DoubleRotateWithRight(Position K1)
+{
+	K1->Right=SingleRotateWithLeft(K1->Right);
+	return SingleRotateWithRight(K1);
+}
 
+
+AvlTree Init(AvlTree T)
+{
+	return NULL;
+}
+AvlTree MakeEmpty(AvlTree T)
+{
+	if(T!=NULL)
+	{
+		MakeEmpty(T->Left);
+		MakeEmpty(T->Right);
+		free(T);
+	}
+	return NULL;
+}
+Position Find(ElementType X,AvlTree T)
+{
+	if(T!=NULL)
+	{
+		if(T->Element>X)
+			return Find(X,T->Left);
+		else if(T->Element<X)
+			return Find(X,T->Right);
+		else
+			return T;
+	}
+	else
+		return T;
+}
+Position FindMin(AvlTree T)
+{
+	if(T!=NULL)
+		while(T->Left!=NULL)
+			T=T->Left;
+	return T;
+}
+Position FindMax(AvlTree T)
+{
+	if(T==NULL)
+		return T;
+	else
+	{
+		if(T->Right!=NULL)
+			return FindMax(T->Right);
+		else
+			return T;
+	}
+}
+AvlTree Insert(ElementType X,AvlTree T)
+{
+	if(T==NULL)
+	{
+		T=malloc(sizeof(struct AvlNode));
+		if(T==NULL)
+			FatalErorr("Out of space!");
+		else
+		{
+			T->Element=X;
+			T->Left=T->Right=NULL;
+		}
+	}
+	else if(X<T->Element)
+	{
+		T->Left=Insert(X,T->Left);
+		if(CatchHeight(T->Left)-CatchHeight(T->Right)==2)
+			if(X<T->Left->Element)
+				T=SingleRotateWithLeft(T);
+			else
+				T=DoubleRotateWithLeft(T);
+	}
+	else if(X>T->Element)
+	{
+		T->Right=Insert(X,T->Right);
+		if(CatchHeight(T->Right)-CatchHeight(T->Left)==2)
+			if(X>T->Right->Element)
+				T=SingleRotateWithRight(T);
+			else
+				T=DoubleRotateWithRight(T);
+	}
+//else X==T->Element ,there will do nothing
+	T->Height=Max(CatchHeight(T->Left),CatchHeight(T->Right))+1;
+	return T;
+}
+AvlTree Delete(ElementType X,AvlTree T)
+{
+
+}
+ElementType Retrieve(Position P)
+{
+	if(P==NULL)
+		Erorr("Wrong position!");
+	else
+		return P->Element;
 }
