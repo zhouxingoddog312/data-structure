@@ -85,7 +85,61 @@ static Position DoubleRotateWithRight(Position K1)
 	K1->Right=SingleRotateWithLeft(K1->Right);
 	return SingleRotateWithRight(K1);
 }
-
+AvlTree Delete(ElementType X,AvlTree T)
+{
+	Position TmpNode;
+	if(T==NULL)
+		Erorr("Element not found!");
+	else if(X<T->Element)
+	{
+		T->Left=Delete(X,T->Left);
+		if(CatchHeight(T->Right)-CatchHeight(T->Left)==2)
+		{
+			TmpNode=T->Right;
+			if(CatchHeight(TmpNode->Left)>CatchHeight(TmpNode->Rgiht))
+				T=DoubleRotateWithRight(T);
+			else
+				T=SingleRotateWithRight(T);
+		}
+	}
+	else if(X>T->Element)
+	{
+		T->Right=Delete(X,T->Right);
+		if(CatchHeight(T->Left)-CatchHeight(T->Right)==2)
+		{
+			TmpNode=T->Left;
+			if(CatchHeight(TmpNode->Left)>CatchHeight(TmpNode->Right))
+				T=SingleRotateWithLeft(T);
+			else
+				T=DoubleRotateWithRight(T);
+		}
+	}
+	else
+	{
+		if(T->Left&&T->Right)	/*two child*/
+		{
+			if(CatchHeight(T->Left)>CatchHeight(T->Right))
+			{
+				TmpNode=FindMax(T->Left);
+				T->Element=TmpNode->Element;
+				T->Left=Delete(TmpNode->Element,T->Left);
+			}
+			else
+			{
+				TmpNode=FindMin(T->Right);
+				T->Element=TmpNode->Element;
+				T->Right=Delete(TmpNode->Element,T->Right);
+			}
+		}
+		else	/*only one or no child*/
+		{
+			TmpNode=T;
+			T=(T->Left==NULL?T->Right:T->Left);
+			free(TmpNode);
+		}
+	}
+	return T;
+}
 
 AvlTree Init(AvlTree T)
 {
