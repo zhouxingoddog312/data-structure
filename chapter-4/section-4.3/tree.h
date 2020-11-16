@@ -14,4 +14,9 @@ SearchTree Insert(ElementType X,SearchTree T);
 SearchTree Delete(ElementType X,SearchTree T);
 ElementType Retrieve(Position P);
 
+void PreOrder(SearchTree T);
+void InOrder(SearchTree T);
+void PostOrder(SearchTree T);
+
+void LevelOrder(SearchTree T);
 #endif

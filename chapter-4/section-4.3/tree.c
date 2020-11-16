@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tree.h"
+#include "queue.h"
 struct TreeNode
 {
 	ElementType Element;
@@ -136,4 +137,37 @@ ElementType Retrieve(Position P)
 		Error("Erorr position!");
 	else
 		return P->Element;
+}
+
+void PreOrder(SearchTree T)
+{
+	if(T!=NULL)
+	{
+		printf("%-5d",T->Element);
+		PreOrder(T->Left);
+		PreOrder(T->Rgiht);
+	}
+}
+void InOrder(SearchTree T)
+{
+	if(T!=NULL)
+	{
+		InOrder(T->Left);
+		printf("%-5d",T->Element);
+		InOrder(T->Right);
+	}
+}
+void PostOrder(SearchTree T)
+{
+	if(T!=NULL)
+	{
+		PostOrder(T->Left);
+		PostOrder(T->Right);
+		printf("%-5d",T->Element);
+	}
+}
+
+void LevelOrder(SearchTree T)
+{
+
 }
