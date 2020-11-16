@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "avltree.h"
+#include "queue.h"
 struct AvlNode
 {
 	ElementType Element;
@@ -96,7 +97,7 @@ AvlTree Delete(ElementType X,AvlTree T)
 		if(CatchHeight(T->Right)-CatchHeight(T->Left)==2)
 		{
 			TmpNode=T->Right;
-			if(CatchHeight(TmpNode->Left)>CatchHeight(TmpNode->Rgiht))
+			if(CatchHeight(TmpNode->Left)>CatchHeight(TmpNode->Right))
 				T=DoubleRotateWithRight(T);
 			else
 				T=SingleRotateWithRight(T);
@@ -223,14 +224,60 @@ AvlTree Insert(ElementType X,AvlTree T)
 	T->Height=Max(CatchHeight(T->Left),CatchHeight(T->Right))+1;
 	return T;
 }
-AvlTree Delete(ElementType X,AvlTree T)
-{
-
-}
 ElementType Retrieve(Position P)
 {
 	if(P==NULL)
 		Erorr("Wrong position!");
 	else
 		return P->Element;
+}
+
+
+void PreOrder(AvlTree T)
+{
+	if(T!=NULL)
+	{
+		printf("%-5d",T->Element);
+		PreOrder(T->Left);
+		PreOrder(T->Right);
+	}
+}
+void InOrder(AvlTree T)
+{
+	if(T!=NULL)
+	{
+		InOrder(T->Left);
+		printf("%-5d",T->Element);
+		InOrder(T->Right);
+	}
+}
+void PostOrder(AvlTree T)
+{
+	if(T!=NULL)
+	{
+		PostOrder(T->Left);
+		PostOrder(T->Right);
+		printf("%-5d",T->Element);
+	}
+}
+void LevelOrder(AvlTree T)
+{
+	Queue Q;
+	Q=CreateQueue(Q);
+	while(T!=NULL)
+	{
+		printf("%-5d",T->Element);
+		if(T->Left!=NULL)
+			Q=EnQueue(T->Left,Q);
+		if(T->Right!=NULL)
+			Q=EnQueue(T->Right,Q);
+		if(IsEmpty(Q))
+			T=NULL;
+		else
+		{
+			T=Front(Q);
+			Q=DeQueue(Q);
+		}
+	}
+	Q=DisposeQueue(Q);
 }

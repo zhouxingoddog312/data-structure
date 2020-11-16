@@ -17,4 +17,8 @@ AvlTree Insert(ElementType X,AvlTree T);
 AvlTree Delete(ElementType X,AvlTree T);
 ElementType Retrieve(Position P);
 
+void PreOrder(AvlTree T);
+void InOrder(AvlTree T);
+void PostOrder(AvlTree T);
+void LevelOrder(AvlTree T);
 #endif
