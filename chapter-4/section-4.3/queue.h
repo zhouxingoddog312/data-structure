@@ -2,9 +2,9 @@
 #define _Queue_H
 #include <stdbool.h>
 #include "tree.h"
-//typedef SearchTree ElementType_Q;
+typedef SearchTree ElementType_Q;
 
-typedef int ElementType_Q;	/*for test*/
+/*typedef int ElementType_Q;	for test*/
 
 struct QueueRecord;
 typedef struct QueueRecord *Queue;

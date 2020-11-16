@@ -145,7 +145,7 @@ void PreOrder(SearchTree T)
 	{
 		printf("%-5d",T->Element);
 		PreOrder(T->Left);
-		PreOrder(T->Rgiht);
+		PreOrder(T->Right);
 	}
 }
 void InOrder(SearchTree T)
@@ -169,5 +169,22 @@ void PostOrder(SearchTree T)
 
 void LevelOrder(SearchTree T)
 {
-
+	Queue Q;
+	Q=CreateQueue(Q);
+	while(T!=NULL)
+	{
+		printf("%-5d",T->Element);
+		if(T->Left!=NULL)
+			Q=EnQueue(T->Left,Q);
+		if(T->Right!=NULL)
+			Q=EnQueue(T->Right,Q);
+		if(IsEmpty(Q))
+			T=NULL;
+		else
+		{
+			T=Front(Q);
+			Q=DeQueue(Q);
+		}
+	}
+	Q=DisposeQueue(Q);
 }
