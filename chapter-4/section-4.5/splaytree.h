@@ -1,0 +1,24 @@
+#ifndef _SplayTree_H
+#define _SplayTree_H
+
+typedef int ElementType;
+
+
+struct SplayNode;
+typedef SplayNode *SplayTree;
+typedef SplayNode *Position;
+
+SplayTree Init(SplayTree T);
+SplayTree MakeEmpty(SplayTree T);
+Position FindMin(SplayTree T);
+Position FindMax(SplayTree T);
+Position Find(ElementType X,SplayTree T);
+SplayTree Insert(ElementType X,SplayTree T);
+SplayTree Delete(ElementType X,SplayTree T);
+ElementType Retrieve(Position P);
+
+void PreOrder(SplayTree T);
+void InOrder(SplayTree T);
+void PostOrder(SplayTree T);
+void LevelOrder(SplayTree T);
+#endif
