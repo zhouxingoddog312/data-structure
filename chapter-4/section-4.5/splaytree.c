@@ -217,7 +217,10 @@ SplayTree Insert(ElementType X,SplayTree T)
 			}
 		}
 		else
+		{
 			puts("Exist!");
+			break;
+		}
 	}
 }
 
