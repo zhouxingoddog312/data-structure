@@ -9,7 +9,7 @@ struct SplayNode
 	Position Parent;
 	Position Left;
 	Position Right;
-}
+};
 
 static void FatalErorr(char *string);
 static Position SearchValue(ElementType X,SplayTree T);
@@ -52,11 +52,11 @@ static Position SearchValue(ElementType X,SplayTree T)
 static void SingleRotateWithLeft(Position P)
 {
 	Position Parent_node,GrandParent_node;
-	Parent_node=P->parent;
-	GrandParent_node=Parent_node->parent;
+	Parent_node=P->Parent;
+	GrandParent_node=Parent_node->Parent;
 	if(GrandParent_node)
 	{
-		if(GrandParent_node->Left==Parent)
+		if(GrandParent_node->Left==Parent_node)
 			GrandParent_node->Left=P;
 		else
 			GrandParent_node->Right=P;
@@ -64,11 +64,11 @@ static void SingleRotateWithLeft(Position P)
 	Parent_node->Parent=P;
 	P->Parent=GrandParent_node;
 	Parent_node->Left=P->Right;
-	P->Right=Parent_node;
 	if(P->Right)
 	{
 		P->Right->Parent=Parent_node;
 	}
+	P->Right=Parent_node;
 }
 static void SingleRotateWithRight(Position P)
 {
@@ -77,7 +77,7 @@ static void SingleRotateWithRight(Position P)
 	GrandParent_node=Parent_node->Parent;
 	if(GrandParent_node)
 	{
-		if(GrandParent_node->Left==Parent)
+		if(GrandParent_node->Left==Parent_node)
 			GrandParent_node->Left=P;
 		else
 			GrandParent_node->Right=P;
@@ -85,11 +85,11 @@ static void SingleRotateWithRight(Position P)
 	Parent_node->Parent=P;
 	P->Parent=GrandParent_node;
 	Parent_node->Right=P->Left;
-	P->Left=Parent_node;
 	if(P->Left)
 	{
 		P->Left->Parent=Parent_node;
 	}
+	P->Left=Parent_node;
 }
 static void DoubleRotateTwiceLeft(Position P)
 {
@@ -117,7 +117,7 @@ static SplayTree Splay(Position P,SplayTree T)
 	while(P->Parent!=NULL)
 	{
 		Parent_node=P->Parent;
-		GrandParent_node=Parent_node->parent;
+		GrandParent_node=Parent_node->Parent;
 		if(T->Left==P)
 			SingleRotateWithLeft(P);
 		else if(T->Right==P)
@@ -221,16 +221,16 @@ SplayTree Insert(ElementType X,SplayTree T)
 	}
 }
 
-SplayTree Delete(ElememtType X,SplayTree T)
+SplayTree Delete(ElementType X,SplayTree T)
 {
 	Position P,Temp,L,R;
 	P=Find(X,T);
-	if(P->Left==NULL&P->Right==NULL)
+	if(P->Left==NULL&&P->Right==NULL)
 		return NULL;
 	else if(P->Left==NULL)
 	{
 		Temp=P;
-		P=P->right;
+		P=P->Right;
 		free(Temp);
 		return P;
 	}
@@ -245,6 +245,9 @@ SplayTree Delete(ElememtType X,SplayTree T)
 	{
 		L=P->Left;
 		R=P->Right;
+		L->Parent=NULL;
+		R->Parent=NULL;
+		free(P);
 		L=FindMax(L);
 		L->Right=R;
 		return L;
@@ -254,7 +257,7 @@ ElementType Retrieve(Position P)
 {
 
 	if(P==NULL)
-		Error("Erorr position!");
+		puts("Erorr position!");
 	else
 		return P->Element;
 }

@@ -1,7 +1,7 @@
 #ifndef _Queue_H
 #define _Queue_H
 #include <stdbool.h>
-#include "avltree.h"
+#include "splaytree.h"
 typedef SplayTree ElementType_Q;
 
 /*typedef int ElementType_Q;	for test*/

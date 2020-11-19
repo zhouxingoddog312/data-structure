@@ -5,8 +5,8 @@ typedef int ElementType;
 
 
 struct SplayNode;
-typedef SplayNode *SplayTree;
-typedef SplayNode *Position;
+typedef struct SplayNode *SplayTree;
+typedef struct SplayNode *Position;
 
 SplayTree Init(SplayTree T);
 SplayTree MakeEmpty(SplayTree T);
