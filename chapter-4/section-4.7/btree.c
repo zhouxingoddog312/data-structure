@@ -6,7 +6,7 @@
 struct BNode
 {
 	Position Parent;
-	int Number;
+	int Number;	//在非叶节点中，指子树的数量。在叶节点中指元素的数量。
 	ElementType KeyWord[M+1];
 	BTree Child[M+1];
 };
@@ -17,6 +17,17 @@ static Erorr(char *string);
 static FatalErorr(char *string);
 static Position MakeNode(void);
 static FindLeaf(ElementType X,Btree T);
+static Position InsertLeaf(ElementType X,Position P);
+static Position DeleteLeaf(ElementType X,Position P);
+static Position NeedAdjustForInsert(Position T);
+static Position NeedAdjustForDelete(Position T);
+
+static void AdjustSiblingForInsert(Position T,Position target);
+static void AdjustSiblingForDelete(Position T,Position target);
+
+static void SplitNode(Position P);
+static void MergeNode(Position P);
+
 
 static Erorr(char *string)
 {
@@ -44,18 +55,23 @@ static Position MakeNode(void)
 	return P;
 }
 
-/*元素存在时打印已存在信息，返回NULL。元素不存在时返回叶节点*/
+/*元素存在时打印已存在信息，返回NULL。元素不存在时返回应当插入的叶节点*/
 static FindLeaf(ElementType X,Btree T)
 {
 	bool found=false;
 	int index=0;
 	while(T->Child[0]!=NULL)
 	{
-		for(index=0;index<T->Number;index++)
+		for(index=0;index<T->Number-1;index++)
 		{
 			if(X<T->KeyWord[index])
 			{
 				T=T->Child[index];
+				break;
+			}
+			else if(index=T->Number-2)
+			{
+				T=T->Child[index+1];
 				break;
 			}
 		}
@@ -77,13 +93,313 @@ static FindLeaf(ElementType X,Btree T)
 		return T;
 }
 
+/*两个参数，插入的元素及被插入的叶节点*/
+static Position InsertLeaf(ElementType X,Position P)
+{
+	int index,i;
+	for(index=0;index<P->Number;index++)	//找到插入点
+	{
+		if(P->KeyWord[index]>X)
+			break;
+	}
+	for(i=P->Number;i>index;i--)	//插入点后的元素都向后移一位
+	{
+		P->KeyWord[i]=P->KeyWord[i-1];
+	}
+	P->KeyWord[index]=X;
+	P->Number++;
+	return P;
+}
+
+/*两个参数，删除的元素及存在该元素的叶节点*/
+static Position DeleteLeaf(ElementType X,Position P)
+{
+	int index;
+	for(index=0;index<P->Number;index++)
+	{
+		if(P->KeyWord[index]==X)
+			break;
+	}
+	for(;index<P->Number-1;index++)
+		P->KeyWord[index]=P->KeyWord[index+1];
+	P->Number--;
+	return P;
+}
+
+/*T指进行了增删操作的节点,返回供调整的目标节点*/
+static Position NeedAdjustForInsert(Position T)
+{
+	Position P=T->Parent;
+	int index;
+	Position need=NULL;
+	if(P!=NULL)
+	{
+		for(index=0;index<P->Number;index++)
+		{
+			if(P->Child[index]->Number<M)
+			{
+				need=P->Child[index];
+				break;
+			}
+		}
+	}
+	return need;
+}
+static Position NeedAdjustForDelete(Position T)
+{
+	Position P=T->Parent;
+	int index;
+	Position need=NULL;
+	if(P!=NULL)
+	{
+		for(index=0;index<P->Number;index++)
+		{
+			if(P->Child[index]->Number>Min_M)
+			{
+				need=P->Child[index];
+				break;
+			}
+		}
+	}
+	return need;
+}
+
+/*T指进行了增删操作的叶节点，target指供调整的目标节点*/
+static void AdjustSiblingForInsert(Position T,Position target)
+{
+	Position P=T->Parent;
+	int total,index,i,j;
+	for(index=0,total=0;index<P->Number;index++)
+	{
+		total+=P->Childe[index]->Number;
+	}
+	if(T->Child[0]==NULL)
+		ElementType trans[total];
+	else
+		Btree trans[total];
+	for(index=0,i=0;i<P->Number;i++)
+	{
+		for(j=0;j<P->Child[i]->Number;index++,j++)
+		{
+			if(T->Child[0]==NULL)
+				trans[index]=P->Child[i]->KeyWord[j];
+			else
+				trans[index]=P->Child[i]->Child[j];
+		}
+	}
+	target->Number+=1;
+	T->Number-=1;
+	for(index=0,i=0;i<P->Number;i++)
+	{
+		for(j=0;j<P->Child[i]->Number;index++,j++)
+		{
+			if(T->Child[0]==NULL)
+				P->Child[i]->KeyWord[j]=trans[index];
+			else
+				P->Child[i]->Child[j]=trans[index];
+		}
+	}
+	for(index=0;index<P->Number-1;index++)	//更新父节点的关键字
+	{
+		P->KeyWord[index]=P->Child[index+1]->KeyWord[0];
+	}
+	/*更新儿子节点的父节点*/
+	if(T->Child[0]!=NULL)
+	{
+		for(i=0;i<P->Number;i++)
+		{
+			for(j=0;j<P->Child[i]->Number;j++)
+				P->Child[i]->Child[j]->Parent=P->Child[i];
+		}
+	}
+}
 
 
+static void AdjustSiblingForDelete(Position T,Position target)
+{
+	Position P=T->Parent;
+	int total,index,i,j;
+	for(index=0,total=0;index<P->Number;index++)
+	{
+		total+=P->Childe[index]->Number;
+	}
+	if(T->Child[0]==NULL)
+		ElementType trans[total];
+	else
+		Btree trans[total];
+	for(index=0,i=0;i<P->Number;i++)
+	{
+		for(j=0;j<P->Child[i]->Number;index++,j++)
+		{
+			if(T->Child[0]==NULL)
+				trans[index]=P->Child[i]->KeyWord[j];
+			else
+				trans[index]=P->Child[i]->Child[j];
+		}
+	}
+	target->Number-=1;
+	T->Number+=1;
+	for(index=0,i=0;i<P->Number;i++)
+	{
+		for(j=0;j<P->Child[i]->Number;index++,j++)
+		{
+			if(T->Child[0]==NULL)
+				P->Child[i]->KeyWord[j]=trans[index];
+			else
+				P->Child[i]->Child[j]=trans[index];
+		}
+	}
+	for(index=0;index<P->Number-1;index++)	//更新父节点的关键字
+	{
+		P->KeyWord[index]=P->Child[index+1]->KeyWord[0];
+	}
+	/*更新儿子节点的父节点*/
+	if(T->Child[0]!=NULL)
+	{
+		for(i=0;i<P->Number;i++)
+		{
+			for(j=0;j<P->Child[i]->Number;j++)
+				P->Child[i]->Child[j]->Parent=P->Child[i];
+		}
+	}
+}
 
+static void SplitNode(Position P)
+{
+	Position temp,root;
+	int index,i;
+	if(P->Child[0]==NULL)
+	{
+		ElementType trans[P->Number];
+		for(index=0;index<P->Number;index++)
+			trans[index]=P->KeyWord[index];
+		temp=MakeNode();
+		i=P->Number;
+		temp->Number=P->Number-Min_M;
+		temp->Parent=P->Parent;
+		P->Number=Min_M;
+		for(index=0;index<i;index++)
+		{
+			if(index<Min_M)
+				P->KeyWord[index]=trans[index];
+			else
+				temp->KeyWord[index-Min_M]=trans[index];
+		}
+		if(P->Parent!=NULL)
+		{
+			/*更新父节点指向儿子的指针*/
+			for(index=0;index<P->Parent->Number;index++)
+			{
+				if(P->Parent->Child[index]==P)
+					break;
+			}
+			for(i=P->Parent->Number;i>index+1;i--)
+				P->Parent->Child[i]=P->Parent->Child[i-1];
+			P->Parent->Child[index+1]=temp;
+			/*更新父节点儿子数*/
+			P->Parent->Number++;
+			/*更新父节点关键字*/
+			for(index=0;index<P->Parent->Number-1;index++)
+				P->Parent->KeyWord[index]=P->Parent->Child[index+1]->KeyWord[0];
+		}
+		else	/*仅有叶节点的情况*/
+		{
+			root=MakeNode();
+			root->Number=2;
+			root->Child[0]=P;
+			root->Child[1]=temp;
+			root->KeyWord[0]=temp->KeyWord[0];
+			P->Parent=temp->Parent=root;
+		}
+	}
+	else
+	{
+		Btree trans[P->Number];
+		for(index=0;index<P->Number;index++)
+			trans[index]=P->Child[index];
+		temp=MakeNode();
+		i=P->Number;
+		temp->Number=P->Number-Min_M;
+		temp->Parent=P->Parent;
+		P->Number=Min_M;
+		for(index=0;index<i;index++)
+		{
+			if(index<Min_M)
+				P->Child[index]=trans[index];
+			else
+				temp->Child[index-Min_M]=trans[index];
+		}
+		/*更新两个节点的关键字及各自儿子节点的父节点*/
+		for(index=0;index<P->Number;index++)
+		{
+			P->Child[index]->Parent=P;
+		}
+		for(index=0;index<P->Number-1;index++)
+		{
+			P->KeyWord[index]=P->Child[index+1]->KeyWord[0];
+		}
+		for(index=0;index<temp->Number;index++)
+		{
+			temp->Child[index]->Parent=temp;
+		}
+		for(index=0;index<P->Number-1;index++)
+		{
+			temp->KeyWord[index]=temp->Child[index+1]->KeyWord[0];
+		}
+		if(P->Parent!=NULL)
+		{
+			/*更新父节点指向儿子的指针*/
+			for(index=0;index<P->Parent->Number;index++)
+			{
+				if(P->Parent->Child[index]==P)
+					break;
+			}
+			for(i=P->Parent->Number;i>index+1;i--)
+				P->Parent->Child[i]=P->Parent->Child[i-1];
+			P->Parent->Child[index+1]=temp;
+			/*更新父节点儿子数*/
+			P->Parent->Number++;
+			/*更新父节点关键字*/
+			for(index=0;index<P->Parent->Number-1;index++)
+				P->Parent->KeyWord[index]=P->Parent->Child[index+1]->KeyWord[0];
+		}
+		else
+		{
+			root=MakeNode();
+			root->Number=2;
+			root->Child[0]=P;
+			root->Child[1]=temp;
+			root->KeyWord[0]=temp->KeyWord[0];
+			P->Parent=temp->Parent=root;
+		}
+	}
+}
 
-
-
-
+static void  MergeNode(Position P)
+{
+	if(P->Child[0]==NULL)
+	{
+		if(P->Parent!=NULL)
+		{
+		
+		}
+		else
+		{
+		
+		}
+	}
+	else
+	{
+		if(P->Parent!=NULL)
+		{
+		
+		}
+		else
+		{
+		
+		}
+	}
+}
 
 
 
@@ -112,11 +428,16 @@ Btree Find(ElementType X,Btree T)
 	int index=0;
 	while(T->Child[0]!=NULL)
 	{
-		for(index=0;index<T->Number;index++)
+		for(index=0;index<T->Number-1;index++)
 		{
 			if(X<T->KeyWord[index])
 			{
 				T=T->Child[index];
+				break;
+			}
+			else if(index==T->Number-2)
+			{
+				T=T->Child[index+1];
 				break;
 			}
 		}
