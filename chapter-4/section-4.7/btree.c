@@ -377,11 +377,42 @@ static void SplitNode(Position P)
 
 static void  MergeNode(Position P)
 {
+	Position temp;
+	int total,index,i,j;
 	if(P->Child[0]==NULL)
 	{
+
 		if(P->Parent!=NULL)
 		{
-		
+			for(index=0;index<P->Parent->Nunber;index++)
+			{
+				if(P->Parent->Child[index]==P)
+					break;
+			}
+			if(index!=0)	//P不是父节点最左边的儿子，与P的左边那个兄弟合并
+			{
+				temp=P->Parent->Child[index-1];
+				total=temp->Number+P->Number;
+				ElementType trans[total];
+				for(i=0;i<temp->Number;i++)
+					trans[i]=temp->KeyWord[i];
+				for(;i-temp->Number<P->Number;i++)
+					trans[i]=P->KeyWord[i-temp->Number];
+				P->Number=total;
+				for(i=0;i<P->Number;i++)
+					P->KeyWord[i]=trans[i];
+				for(i=index-1;i<P->Parent-Number-1;i++)		//删除被合并的兄弟在父节点的指针
+					P->Parent->Child[i]=P->Parent->Child[i+1];
+
+
+
+
+				free(temp);
+			}
+			else	//P与右边的兄弟合并
+			{
+				temp=P->Parent->Child[index+1];
+			}
 		}
 		else
 		{
