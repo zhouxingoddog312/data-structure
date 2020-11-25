@@ -15,12 +15,14 @@ static const ElementType Unused=INT_MIN;
 
 static Erorr(char *string);
 static FatalErorr(char *string);
+static ElementType FindMin(Btree T);
 static Position MakeNode(void);
-static FindLeaf(ElementType X,Btree T);
+static Position FindLeaf(ElementType X,Btree T);
 static Position InsertLeaf(ElementType X,Position P);
 static Position DeleteLeaf(ElementType X,Position P);
 static Position NeedAdjustForInsert(Position T);
 static Position NeedAdjustForDelete(Position T);
+
 
 static void AdjustSiblingForInsert(Position T,Position target);
 static void AdjustSiblingForDelete(Position T,Position target);
@@ -37,6 +39,12 @@ static FatalErorr(char *string)
 {
 	fputs("string\n",stderr);
 	exit(EXIT_FAILURE);
+}
+static ElementType FindMin(Btree T)	//返回子树的最小元素
+{
+	while(T->Child[0]!=NULL)
+		T=T->Child[0];
+	return T->KeyWord[0];
 }
 static Position MakeNode(void)
 {
@@ -56,7 +64,7 @@ static Position MakeNode(void)
 }
 
 /*元素存在时打印已存在信息，返回NULL。元素不存在时返回应当插入的叶节点*/
-static FindLeaf(ElementType X,Btree T)
+static Position FindLeaf(ElementType X,Btree T)
 {
 	bool found=false;
 	int index=0;
@@ -126,7 +134,7 @@ static Position DeleteLeaf(ElementType X,Position P)
 	return P;
 }
 
-/*T指进行了增删操作的节点,返回供调整的目标节点*/
+/*T指进行了增删操作的节点,返回供调整的目标节点,若不可以调整则返回NULL*/
 static Position NeedAdjustForInsert(Position T)
 {
 	Position P=T->Parent;
@@ -201,7 +209,7 @@ static void AdjustSiblingForInsert(Position T,Position target)
 	}
 	for(index=0;index<P->Number-1;index++)	//更新父节点的关键字
 	{
-		P->KeyWord[index]=P->Child[index+1]->KeyWord[0];
+		P->KeyWord[index]=FindMin(P->Child[index+1]);
 	}
 	/*更新儿子节点的父节点*/
 	if(T->Child[0]!=NULL)
@@ -251,7 +259,7 @@ static void AdjustSiblingForDelete(Position T,Position target)
 	}
 	for(index=0;index<P->Number-1;index++)	//更新父节点的关键字
 	{
-		P->KeyWord[index]=P->Child[index+1]->KeyWord[0];
+		P->KeyWord[index]=FindMin(P->Child[index+1]);
 	}
 	/*更新儿子节点的父节点*/
 	if(T->Child[0]!=NULL)
@@ -300,7 +308,7 @@ static void SplitNode(Position P)
 			P->Parent->Number++;
 			/*更新父节点关键字*/
 			for(index=0;index<P->Parent->Number-1;index++)
-				P->Parent->KeyWord[index]=P->Parent->Child[index+1]->KeyWord[0];
+				P->Parent->KeyWord[index]=FindMin(P->Parent->Child[index+1]);
 		}
 		else	/*仅有叶节点的情况*/
 		{
@@ -336,7 +344,7 @@ static void SplitNode(Position P)
 		}
 		for(index=0;index<P->Number-1;index++)
 		{
-			P->KeyWord[index]=P->Child[index+1]->KeyWord[0];
+			P->KeyWord[index]=FindMin(P->Child[index+1]);
 		}
 		for(index=0;index<temp->Number;index++)
 		{
@@ -344,7 +352,7 @@ static void SplitNode(Position P)
 		}
 		for(index=0;index<P->Number-1;index++)
 		{
-			temp->KeyWord[index]=temp->Child[index+1]->KeyWord[0];
+			temp->KeyWord[index]=FindMin(temp->Child[index+1]);
 		}
 		if(P->Parent!=NULL)
 		{
@@ -361,7 +369,7 @@ static void SplitNode(Position P)
 			P->Parent->Number++;
 			/*更新父节点关键字*/
 			for(index=0;index<P->Parent->Number-1;index++)
-				P->Parent->KeyWord[index]=P->Parent->Child[index+1]->KeyWord[0];
+				P->Parent->KeyWord[index]=FindMin(P->Parent->Child[index+1]);
 		}
 		else
 		{
@@ -379,9 +387,8 @@ static void  MergeNode(Position P)
 {
 	Position temp;
 	int total,index,i,j;
-	if(P->Child[0]==NULL)
+	if(P->Child[0]==NULL)	//P是叶节点
 	{
-
 		if(P->Parent!=NULL)
 		{
 			for(index=0;index<P->Parent->Nunber;index++)
@@ -403,31 +410,103 @@ static void  MergeNode(Position P)
 					P->KeyWord[i]=trans[i];
 				for(i=index-1;i<P->Parent-Number-1;i++)		//删除被合并的兄弟在父节点的指针
 					P->Parent->Child[i]=P->Parent->Child[i+1];
-
-
-
-
-				free(temp);
+				P->Parent->Number-=1;
+				for(i=0;i<P->Parent->Number-1;i++)
+					P->Parent->KeyWord[i]=FindMin(P->Parent->Child[i+1]);	//更新父节点关键字
+				free(temp);	//删除废弃叶节点
 			}
 			else	//P与右边的兄弟合并
 			{
 				temp=P->Parent->Child[index+1];
+				total=temp->Number+P->Number;
+				ElementType trans[total];
+				for(i=0;i<P->Number;i++)
+					trans[i]=P->KeyWord[i];
+				for(;i-P->Number<temp->Number;i++)
+					trans[i]=temp->KeyWord[i-P->Number];
+				P->Number=total;
+				for(i=0;i<P->Number;i++)
+					P->KeyWord[i]=trans[i];
+				for(i=index+1;i<P->Parent->Number-1;i++)	//删除被合并的兄弟在父节点的指针
+					P->Parent->Child[i]=P->Parent->Child[i+1];
+				P->Parent->Number-=1;
+				for(i=0;i<P->Parent->Number-1;i++)	//更新父节点关键字
+					P->Parent->KeyWord[i]=FindMin(P->Parent->Child[i+1]);
+				free(temp);	//删除废弃叶节点
 			}
 		}
 		else
 		{
-		
+			Erorr("The only leaf has too little keyword!");
 		}
 	}
-	else
+	else	//P是非叶节点
 	{
 		if(P->Parent!=NULL)
 		{
-		
+			for(index=0;index<P->Parent->Number;index++)
+			{
+				if(P==P->Parent->Child[index])
+					break;
+			}
+			if(index!=0)	//P不是最左边的节点，与P左边的兄弟合并
+			{
+				temp=P->Parent->Child[index-1];
+				total=P->Number+temp->Number;
+				Btree trans[total];
+				for(i=0;i<temp->Number;i++)
+					trans[i]=temp->Child[i];
+				for(;i-temp->Number<P->Number;i++)
+					trans[i]=P->Child[i-temp->Number];
+				P->Number=total;
+				for(i=0;i<P->Number;i++)
+				{
+					P->Child[i]=trans[i];
+					P->Child[i]->Parent=P;	//更新P的所有儿子节点的父节点
+				}
+				for(i=0;i<P->Number-1;i++)	//更新P节点的关键字
+				{
+					P->KeyWord[i]=FindMin(P->Child[i+1]);
+				}
+				for(i=index-1;i<P->Parent->Number-1;i++)	//删除被合并的兄弟在父节点的指针
+					P->Parent->Child[i]=P->Parent->Child[i+1];
+				P->Parent->Number-=1;
+				for(i=0;i<P->Parent->Number-1;i++)	//更新父节点的关键字
+					P->Parent->KeyWord[i]=FindMin(P->Parent->Child[i+1]);
+				free(temp);	//删除废弃节点
+			}
+			else	//P与右边的兄弟合并
+			{
+				temp=P->Parent->Child[index+1];
+				total=P->Number+temp->Number;
+				Btree trans[total];
+				for(i=0;i<P->Number;i++)
+					trans[i]=P->Child[i];
+				for(;i-P->Number<temp->Number;i++)
+					trans[i]=temp->Child[i-P->Number];
+				P->Number=total;
+				for(i=0;i<P->Number;i++)
+				{
+					P->Child[i]=trans[i];
+					P->Child[i]->Parent=P;	//更新P的所有儿子节点的父节点
+				}
+				for(i=0;i<P->Number-1;i++)	//更新P节点的关键字
+				{
+					P->KeyWord[i]=FindMin(P->Child[i+1]);
+				}
+				for(i=index+1;i<P->Parent->Number-1;i++)	//删除被合并的兄弟在父节点的指针
+					P->Parent->Child[i]=P->Parent->Child[i+1];
+				P->Parent->Number-=1;
+				for(i=0;i<P->Parent->Number-1;i++)	//更新父节点的关键字
+					P->Parent->KeyWord[i]=FindMin(P->Parent->Child[i+1]);
+				free(temp);	//删除废弃节点
+			}
 		}
-		else
+		else	//处理根节点少于两个儿子的情况
 		{
-		
+			temp=P;
+			P->Child[0]->Parent=NULL;
+			free(temp);
 		}
 	}
 }
