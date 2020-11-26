@@ -12,5 +12,12 @@ int main(void)
 	Travel(T);
 	Delete(3,T);
 	Travel(T);
+	T=Insert(8,T);
+	T=Insert(6,T);
+	T=Insert(7,T);
+	Travel(T);
+	Delete(1,T);
+	Travel(T);
+	T=Dispose(T);
 	return 0;
 }

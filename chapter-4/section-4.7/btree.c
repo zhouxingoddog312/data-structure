@@ -175,37 +175,48 @@ static Position NeedAdjustForDelete(Position T)
 /*T指进行了增删操作的叶节点，target指供调整的目标节点*/
 static void AdjustSiblingForInsert(Position T,Position target)
 {
-	Position P;
+	Position P=T->Parent;
 	int total,index,i,j;
-	P=T->Parent;
 	for(index=0,total=0;index<P->Number;index++)
-	{
 		total+=P->Child[index]->Number;
-	}
 	if(T->Child[0]==NULL)
-		ElementType trans[total];
-	else
-		Btree trans[total];
-	for(index=0,i=0;i<P->Number;i++)
 	{
-		for(j=0;j<P->Child[i]->Number;index++,j++)
+		ElementType trans[total];
+		for(index=0,i=0;i<P->Number;i++)
 		{
-			if(T->Child[0]==NULL)
-				trans[index]=P->Child[i]->KeyWord[j];
-			else
-				trans[index]=P->Child[i]->Child[j];
+			for(j=0;j<P->Child[i]->Number;index++,j++)
+			{
+					trans[index]=P->Child[i]->KeyWord[j];
+			}
+		}
+		target->Number+=1;
+		T->Number-=1;
+		for(index=0,i=0;i<P->Number;i++)
+		{
+			for(j=0;j<P->Child[i]->Number;index++,j++)
+			{
+					P->Child[i]->KeyWord[j]=trans[index];
+			}
 		}
 	}
-	target->Number+=1;
-	T->Number-=1;
-	for(index=0,i=0;i<P->Number;i++)
+	else
 	{
-		for(j=0;j<P->Child[i]->Number;index++,j++)
+		Btree trans[total];
+		for(index=0,i=0;i<P->Number;i++)
 		{
-			if(T->Child[0]==NULL)
-				P->Child[i]->KeyWord[j]=trans[index];
-			else
-				P->Child[i]->Child[j]=trans[index];
+			for(j=0;j<P->Child[i]->Number;index++,j++)
+			{
+					trans[index]=P->Child[i]->Child[j];
+			}
+		}
+		target->Number+=1;
+		T->Number-=1;
+		for(index=0,i=0;i<P->Number;i++)
+		{
+			for(j=0;j<P->Child[i]->Number;index++,j++)
+			{
+					P->Child[i]->Child[j]=trans[index];
+			}
 		}
 	}
 	for(index=0;index<P->Number-1;index++)	//更新父节点的关键字
@@ -235,33 +246,45 @@ static void AdjustSiblingForDelete(Position T,Position target)
 	if(T->Child[0]==NULL)
 	{
 		ElementType trans[total];
+		for(index=0,i=0;i<P->Number;i++)
+		{
+			for(j=0;j<P->Child[i]->Number;index++,j++)
+			{
+				trans[index]=P->Child[i]->KeyWord[j];
+			}
+		}
+		target->Number-=1;
+		T->Number+=1;
+		for(index=0,i=0;i<P->Number;i++)
+		{
+			for(j=0;j<P->Child[i]->Number;index++,j++)
+			{
+				P->Child[i]->KeyWord[j]=trans[index];
+			}
+		}
 	}
 	else
 	{
 		Btree trans[total];
-	}
-	for(index=0,i=0;i<P->Number;i++)
-	{
-		for(j=0;j<P->Child[i]->Number;index++,j++)
+		for(index=0,i=0;i<P->Number;i++)
 		{
-			if(T->Child[0]==NULL)
-				trans[index]=P->Child[i]->KeyWord[j];
-			else
+			for(j=0;j<P->Child[i]->Number;index++,j++)
+			{
 				trans[index]=P->Child[i]->Child[j];
+			}
 		}
-	}
-	target->Number-=1;
-	T->Number+=1;
-	for(index=0,i=0;i<P->Number;i++)
-	{
-		for(j=0;j<P->Child[i]->Number;index++,j++)
+		target->Number-=1;
+		T->Number+=1;
+		for(index=0,i=0;i<P->Number;i++)
 		{
-			if(T->Child[0]==NULL)
-				P->Child[i]->KeyWord[j]=trans[index];
-			else
+			for(j=0;j<P->Child[i]->Number;index++,j++)
+			{
 				P->Child[i]->Child[j]=trans[index];
+			}
 		}
 	}
+
+
 	for(index=0;index<P->Number-1;index++)	//更新父节点的关键字
 	{
 		P->KeyWord[index]=FindMin(P->Child[index+1]);
