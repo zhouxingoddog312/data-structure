@@ -2,19 +2,19 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <limits.h>
-#include "Btree.h"
+#include "btree.h"
 struct BNode
 {
 	Position Parent;
 	int Number;	//在非叶节点中，指子树的数量。在叶节点中指元素的数量。
 	ElementType KeyWord[M+1];
-	BTree Child[M+1];
+	Btree Child[M+1];
 };
 static const ElementType Unused=INT_MIN;
 
 
-static Erorr(char *string);
-static FatalErorr(char *string);
+static void Erorr(char *string);
+static void FatalErorr(char *string);
 static ElementType FindMin(Btree T);
 static Position MakeNode(void);
 static Position FindLeaf(ElementType X,Btree T);
@@ -31,11 +31,11 @@ static void SplitNode(Position P);
 static void MergeNode(Position P);
 
 
-static Erorr(char *string)
+static void Erorr(char *string)
 {
 	fputs("string\n",stderr);
 }
-static FatalErorr(char *string)
+static void FatalErorr(char *string)
 {
 	fputs("string\n",stderr);
 	exit(EXIT_FAILURE);
@@ -175,11 +175,12 @@ static Position NeedAdjustForDelete(Position T)
 /*T指进行了增删操作的叶节点，target指供调整的目标节点*/
 static void AdjustSiblingForInsert(Position T,Position target)
 {
-	Position P=T->Parent;
+	Position P;
 	int total,index,i,j;
+	P=T->Parent;
 	for(index=0,total=0;index<P->Number;index++)
 	{
-		total+=P->Childe[index]->Number;
+		total+=P->Child[index]->Number;
 	}
 	if(T->Child[0]==NULL)
 		ElementType trans[total];
@@ -229,12 +230,16 @@ static void AdjustSiblingForDelete(Position T,Position target)
 	int total,index,i,j;
 	for(index=0,total=0;index<P->Number;index++)
 	{
-		total+=P->Childe[index]->Number;
+		total+=P->Child[index]->Number;
 	}
 	if(T->Child[0]==NULL)
+	{
 		ElementType trans[total];
+	}
 	else
+	{
 		Btree trans[total];
+	}
 	for(index=0,i=0;i<P->Number;i++)
 	{
 		for(j=0;j<P->Child[i]->Number;index++,j++)
@@ -391,7 +396,7 @@ static void  MergeNode(Position P)
 	{
 		if(P->Parent!=NULL)
 		{
-			for(index=0;index<P->Parent->Nunber;index++)
+			for(index=0;index<P->Parent->Number;index++)
 			{
 				if(P->Parent->Child[index]==P)
 					break;
@@ -408,7 +413,7 @@ static void  MergeNode(Position P)
 				P->Number=total;
 				for(i=0;i<P->Number;i++)
 					P->KeyWord[i]=trans[i];
-				for(i=index-1;i<P->Parent-Number-1;i++)		//删除被合并的兄弟在父节点的指针
+				for(i=index-1;i<P->Parent->Number-1;i++)		//删除被合并的兄弟在父节点的指针
 					P->Parent->Child[i]=P->Parent->Child[i+1];
 				P->Parent->Number-=1;
 				for(i=0;i<P->Parent->Number-1;i++)
@@ -564,4 +569,110 @@ Btree Find(ElementType X,Btree T)
 		return T;
 	else
 		return NULL;
+}
+
+Btree Insert(ElementType X,Btree T)
+{
+	int index;
+	Position temp,P,target;
+	P=FindLeaf(X,T);
+	if(P==NULL)
+	{
+		Erorr("Element has exist!");
+			return T;
+	}
+	else
+	{
+		P=InsertLeaf(X,P);
+		temp=P;
+		while(temp!=NULL)
+		{
+			if(temp->Number<=M)
+			{
+				if(temp->Child[0]!=NULL)
+				{
+					for(index=0;index<temp->Number-1;index++)	//更新非叶子节点的关键字
+						temp->KeyWord[index]=FindMin(temp->Child[index+1]);
+				}
+			}
+			else if((target=NeedAdjustForInsert(temp))!=NULL)
+			{
+				AdjustSiblingForInsert(temp,target);
+			}
+			else
+			{
+				SplitNode(temp);
+			}
+			temp=temp->Parent;
+		}
+		while(P->Parent!=NULL)
+			P=P->Parent;
+		return P;
+	}
+}
+
+Btree Delete(ElementType X,Btree T)
+{
+	int index;
+	Position P,target,temp;
+	P=Find(X,T);
+	if(P==NULL)
+	{
+		Erorr("Element not exist!");
+		return T;
+	}
+	else
+	{
+		P=DeleteLeaf(X,P);
+		temp=P;
+		while(temp!=NULL)
+		{
+			if(temp->Number>=Min_M)
+			{
+				if(temp->Child[0]!=NULL)
+					for(index=0;index<temp->Number-1;index++)
+						temp->KeyWord[index]=FindMin(temp->Child[index+1]);
+			}
+			else if((target=NeedAdjustForDelete(temp))!=NULL)
+			{
+				AdjustSiblingForDelete(temp,target);
+			}
+			else
+			{
+				MergeNode(temp);
+			}
+			temp=temp->Parent;
+		}
+		while(P->Parent!=NULL)
+			P=P->Parent;
+		return P;
+	}
+}
+Btree Dispose(Btree T)
+{
+	int index;
+	if(T!=NULL)
+	{
+		for(index=0;index<T->Number;index++)
+			Dispose(T->Child[index]);
+		free(T);
+		T=NULL;
+	}
+	return T;
+}
+
+void Travel(Btree T)
+{
+	int index,i;
+	if(T!=NULL)
+	{
+		for(index=0;index<T->Number;index++)
+			Travel(T->Child[index]);
+		if(T->Child[0]==NULL)
+		{
+			for(i=0;i<T->Number;i++)
+				printf("%5d",T->KeyWord[i]);
+			printf("   $$\n");
+		}
+	}
 }
