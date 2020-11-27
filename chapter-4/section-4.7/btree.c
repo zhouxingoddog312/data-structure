@@ -77,7 +77,7 @@ static Position FindLeaf(ElementType X,Btree T)
 				T=T->Child[index];
 				break;
 			}
-			else if(index=T->Number-2)
+			else if(index==T->Number-2)
 			{
 				T=T->Child[index+1];
 				break;
