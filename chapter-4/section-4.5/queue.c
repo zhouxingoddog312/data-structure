@@ -7,11 +7,11 @@ struct QueueRecord
 	Position_Q Next;
 };
 
-static void FatalErorr(char *string);
+static void FatalError(char *string);
 static Position_Q MakeNode(ElementType_Q X);
 
 
-static void FatalErorr(char *string)
+static void FatalError(char *string)
 {
 	fputs("string\n",stderr);
 	exit(EXIT_FAILURE);
@@ -21,7 +21,7 @@ static Position_Q MakeNode(ElementType_Q X)
 	Position_Q P;
 	P=malloc(sizeof(struct QueueRecord));
 	if(P==NULL)
-		FatalErorr("No more space for queue!");
+		FatalError("No more space for queue!");
 	else
 	{
 		P->Element=X;

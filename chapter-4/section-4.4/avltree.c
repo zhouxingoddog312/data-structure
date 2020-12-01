@@ -10,8 +10,8 @@ struct AvlNode
 	int Height;
 };
 
-static void FatalErorr(char *string);
-static void Erorr(char *string);
+static void FatalError(char *string);
+static void Error(char *string);
 static int CatchHeight(Position P);
 /*return zhe height of the node*/
 
@@ -37,12 +37,12 @@ static Position DoubleRotateWithRight(Position K1);
   Do the right-left double rotation.
   Update heights, then return new root.*/
 
-static void FatalErorr(char *string)
+static void FatalError(char *string)
 {
 	fputs("string\n",stderr);
 	exit(EXIT_FAILURE);
 }
-static void Erorr(char *string)
+static void Error(char *string)
 {
 	fputs("string\n",stderr);
 }
@@ -90,7 +90,7 @@ AvlTree Delete(ElementType X,AvlTree T)
 {
 	Position TmpNode;
 	if(T==NULL)
-		Erorr("Element not found!");
+		Error("Element not found!");
 	else if(X<T->Element)
 	{
 		T->Left=Delete(X,T->Left);
@@ -195,7 +195,7 @@ AvlTree Insert(ElementType X,AvlTree T)
 	{
 		T=malloc(sizeof(struct AvlNode));
 		if(T==NULL)
-			FatalErorr("Out of space!");
+			FatalError("Out of space!");
 		else
 		{
 			T->Element=X;
@@ -227,7 +227,7 @@ AvlTree Insert(ElementType X,AvlTree T)
 ElementType Retrieve(Position P)
 {
 	if(P==NULL)
-		Erorr("Wrong position!");
+		Error("Wrong position!");
 	else
 		return P->Element;
 }

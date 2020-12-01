@@ -11,7 +11,7 @@ struct SplayNode
 	Position Right;
 };
 
-static void FatalErorr(char *string);
+static void FatalError(char *string);
 static Position SearchValue(ElementType X,SplayTree T);
 static void SingleRotateWithLeft(Position P);
 static void SingleRotateWithRight(Position P);
@@ -23,7 +23,7 @@ static SplayTree Splay(Position P,SplayTree T);
 static Position MakeNode(ElementType X);
 
 
-static void FatalErorr(char *string)
+static void FatalError(char *string)
 {
 	fputs("string\n",stderr);
 	exit(EXIT_FAILURE);
@@ -33,7 +33,7 @@ static Position MakeNode(ElementType X)
 	Position P;
 	P=malloc(sizeof(struct SplayNode));
 	if(P==NULL)
-		FatalErorr("Out of space!");
+		FatalError("Out of space!");
 	P->Parent=P->Left=P->Right=NULL;
 	P->Element=X;
 	return P;
@@ -260,7 +260,7 @@ ElementType Retrieve(Position P)
 {
 
 	if(P==NULL)
-		puts("Erorr position!");
+		puts("Error position!");
 	else
 		return P->Element;
 }

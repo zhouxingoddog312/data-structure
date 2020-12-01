@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <limits.h>
 #include "tree.h"
 #include "queue.h"
 struct TreeNode
@@ -8,6 +10,14 @@ struct TreeNode
 	SearchTree Left;
 	SearchTree Right;
 };
+struct TreeNode CursorSpace[SpaceSize];
+
+static void FatalError(char *S);
+static void Error(char *S);
+static Position CursorMalloc(void);
+static void CursorFree(Position P);
+
+
 
 static void FatalError(char *S)
 {
@@ -18,31 +28,57 @@ static void Error(char *S)
 {
 	puts(S);
 }
+static Position CursorMalloc(void)
+{
+	Position P;
+	P=CursorSpace[0].Left;
+	CursorSpace[0].Left=CursorSpace[0].Right=CursorSpace[P].Left;
+	return P;
+}
+static void CursorFree(Position P)
+{
+	CursorSpace[P].Left=CursorSpace[P].Right=CursorSpace[0].Left;
+	CursorSpace[0].Left=CursorSpace[0].Right=P;
+}
+
+void InitCursorSpace(void)
+{
+	int index;
+	for(index=0;index<SpaceSize;index++)
+	{
+		CursorSpace[index].ElementType=INT_MIN;
+		if(index<SpaceSize-1)
+			CursorSpace[index].Left=CursorSpace[index].Right=index+1;
+		else
+			CursorSpace[index].Left=CursorSpace[index].Right=0;
+	}
+}
 
 SearchTree Init(SearchTree T)
 {
-	return NULL;
+	return 0;
 }
 SearchTree MakeEmpty(SearchTree T)
 {
-	if(T!=NULL)
+	if(T!=0)
 	{
-		MakeEmpty(T->Left);
-		MakeEmpty(T->Right);
-		free(T);
+		MakeEmpty(CursorSpace[T].Left);
+		MakeEmpty(CursorSpace[T].Right);
+		CursorFree(T);
 	}
-	return NULL;
+	return 0;
 }
+
 
 Position Find(ElementType X,SearchTree T)
 {
 	Position P=T;
-	if(P!=NULL)
+	if(P!=0)
 	{
-		if(P->Element<X)
-			return Find(X,P->Right);
-		else if(P->Element>X)
-			return Find(X,P->Left);
+		if(CursorSpace[P].Element<X)
+			return Find(X,CursorSpace[P].Right);
+		else if(CursorSpace[P].Element>X)
+			return Find(X,CursorSpace[P].Left);
 		else
 			return P;
 	}
@@ -53,10 +89,10 @@ Position Find(ElementType X,SearchTree T)
 Position FindMin(SearchTree T)
 {
 	Position P=T;
-	if(P==NULL)
-		return NULL;
-	if(P->Left!=NULL)
-		return FindMin(P->Left);
+	if(P==0)
+		return 0;
+	if(CursorSpace[P].Left!=0)
+		return FindMin(CursorSpace[P].Left);
 	else
 		return P;
 }
@@ -64,39 +100,35 @@ Position FindMin(SearchTree T)
 Position FindMax(SearchTree T)
 {
 	Position P=T;
-	if(P==NULL)
-		return NULL;
-	if(P->Right!=NULL)
-		return FindMax(P->Right);
+	if(P==0)
+		return 0;
+	if(CursorSpace[P].Right!=0)
+		return FindMax(CursorSpace[P].Right);
 	else
 		return P;
 }
-
 SearchTree Insert(ElementType X,SearchTree T)
 {
-	if(T==NULL)
+	if(T==0)
 	{
-		T=malloc(sizeof(struct TreeNode));
-		if(T==NULL)
+		T=CursorMalloc();
+		if(T==0)
 			FatalError("Out of space!");
 		else
 		{
-			T->Element=X;
-			T->Left=T->Right=NULL;
+			CursorSpace[T].Element=X;
+			CursorSpace[T].Left=CursorSpace[T].Right=0;
 		}
 	}
-	else
-	if(T->Element>X)
-		T->Left=Insert(X,T->Left);
-	else
-	if(T->Element<X)
-		T->Right=Insert(X,T->Right);
-/*	else
-
-if T->Element==X,there will do nothing
-*/
+	else if(CursorSpace[T].Element>X)
+		CursorSpace[T].Left=Insert(X,CursorSpace[T].Left);
+	else if(CursorSpace[T].Element<X)
+		CursorSpace[T].Right=Insert(X,CursorSpace[T].Right);
+//	else if CursorSpace[T].Element==X,there will do nothing
 	return T;
 }
+
+
 
 SearchTree Delete(ElementType X,SearchTree T)
 {

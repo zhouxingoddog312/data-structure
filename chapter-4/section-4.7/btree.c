@@ -13,8 +13,8 @@ struct BNode
 static const ElementType Unused=INT_MIN;
 
 
-static void Erorr(char *string);
-static void FatalErorr(char *string);
+static void Error(char *string);
+static void FatalError(char *string);
 static ElementType FindMin(Btree T);
 static Position MakeNode(void);
 static Position FindLeaf(ElementType X,Btree T);
@@ -31,11 +31,11 @@ static void SplitNode(Position P);
 static void MergeNode(Position P);
 
 
-static void Erorr(char *string)
+static void Error(char *string)
 {
 	fputs("string\n",stderr);
 }
-static void FatalErorr(char *string)
+static void FatalError(char *string)
 {
 	fputs("string\n",stderr);
 	exit(EXIT_FAILURE);
@@ -52,7 +52,7 @@ static Position MakeNode(void)
 	Position P;
 	P=malloc(sizeof(struct BNode));
 	if(P==NULL)
-		FatalErorr("Out of space!");
+		FatalError("Out of space!");
 	P->Parent=NULL;
 	P->Number=0;
 	for(i=0;i<M+1;i++)
@@ -94,7 +94,7 @@ static Position FindLeaf(ElementType X,Btree T)
 	}
 	if(found)
 	{
-		Erorr("Element exist!");
+		Error("Element exist!");
 		return NULL;
 	}
 	else
@@ -465,7 +465,7 @@ static void  MergeNode(Position P)
 		}
 		else
 		{
-			Erorr("The only leaf has too little keyword!");
+			Error("The only leaf has too little keyword!");
 		}
 	}
 	else	//P是非叶节点
@@ -554,7 +554,7 @@ static void  MergeNode(Position P)
 Btree Init(Btree T)
 {
 	if(M<3)
-		FatalErorr("Need more than three order!");
+		FatalError("Need more than three order!");
 	T=MakeNode();
 	return T;
 }
@@ -601,7 +601,7 @@ Btree Insert(ElementType X,Btree T)
 	P=FindLeaf(X,T);
 	if(P==NULL)
 	{
-		Erorr("Element has exist!");
+		Error("Element has exist!");
 			return T;
 	}
 	else
@@ -641,7 +641,7 @@ Btree Delete(ElementType X,Btree T)
 	P=Find(X,T);
 	if(P==NULL)
 	{
-		Erorr("Element not exist!");
+		Error("Element not exist!");
 		return T;
 	}
 	else
