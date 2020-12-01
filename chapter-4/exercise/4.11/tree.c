@@ -133,31 +133,31 @@ SearchTree Insert(ElementType X,SearchTree T)
 SearchTree Delete(ElementType X,SearchTree T)
 {
 	Position Tmpcell;
-	if(T==NULL)
+	if(T==0)
 		Error("Element not found!");
 	else
-	if(X>T->Element)
-		T->Right=Delete(X,T->Right);
+	if(X>CursorSpace[T].Element)
+		CursorSpace[T].Right=Delete(X,CursorSpace[T].Right);
 	else
-	if(X<T->Element)
-		T->Left=Delete(X,T->Left);
+	if(X<CursorSpace[T].Element)
+		CursorSpace[T].Left=Delete(X,CursorSpace[T].Left);
 	else
 	{
-		if(T->Left && T->Right)
+		if(CursorSpace[T].Left&&CursorSpace[T].Right)
 		{
-			Tmpcell=FindMin(T->Right);
-			T->Element=Tmpcell->Element;
-			T->Right=Delete(T->Element,T->Right);
+			Tmpcell=FindMin(CursorSpace[T].Right);
+			CursorSpace[T].Element=CursorSpace[Tmpcell].Element;
+			CursorSpace[T].Right=Delete(CursorSpace[T].Element,CursorSpace[T].Right);
 		}
 		else
 		{
 			Tmpcell=T;
-			if(T->Left==NULL)
-				T=T->Right;
+			if(CursorSpace[T].Left==0)
+				T=CursorSpace[T].Right;
 			else
-			if(T->Right==NULL)
-				T=T->Left;
-			free(Tmpcell);
+			if(CursorSpace[T].Right==0)
+				T=CursorSpace[T].Left;
+			CursorFree(Tmpcell);
 		}
 	}
 	return T;
@@ -165,37 +165,37 @@ SearchTree Delete(ElementType X,SearchTree T)
 
 ElementType Retrieve(Position P)
 {
-	if(P==NULL)
+	if(P==0)
 		Error("Error position!");
 	else
-		return P->Element;
+		return CursorSpace[P].Element;
 }
 
 void PreOrder(SearchTree T)
 {
-	if(T!=NULL)
+	if(T!=0)
 	{
-		printf("%-5d",T->Element);
-		PreOrder(T->Left);
-		PreOrder(T->Right);
+		printf("%-5d",CursorSpace[T].Element);
+		PreOrder(CursorSpace[T].Left);
+		PreOrder(CursorSpace[T].Right);
 	}
 }
 void InOrder(SearchTree T)
 {
-	if(T!=NULL)
+	if(T!=0)
 	{
-		InOrder(T->Left);
-		printf("%-5d",T->Element);
-		InOrder(T->Right);
+		InOrder(CursorSpace[T].Left);
+		printf("%-5d",CursorSpace[T].Element);
+		InOrder(CursorSpace[T].Right);
 	}
 }
 void PostOrder(SearchTree T)
 {
-	if(T!=NULL)
+	if(T!=0)
 	{
-		PostOrder(T->Left);
-		PostOrder(T->Right);
-		printf("%-5d",T->Element);
+		PostOrder(CursorSpace[T].Left);
+		PostOrder(CursorSpace[T].Right);
+		printf("%-5d",CursorSpace[T].Element);
 	}
 }
 
@@ -203,15 +203,15 @@ void LevelOrder(SearchTree T)
 {
 	Queue Q;
 	Q=CreateQueue(Q);
-	while(T!=NULL)
+	while(T!=0)
 	{
-		printf("%-5d",T->Element);
-		if(T->Left!=NULL)
-			Q=EnQueue(T->Left,Q);
-		if(T->Right!=NULL)
-			Q=EnQueue(T->Right,Q);
+		printf("%-5d",CursorSpace[T].Element);
+		if(CursorSpace[T].Left!=0)
+			Q=EnQueue(CursorSpace[T].Left,Q);
+		if(CursorSpace[T].Right!=0)
+			Q=EnQueue(CursorSpace[T].Right,Q);
 		if(IsEmpty(Q))
-			T=NULL;
+			T=0;
 		else
 		{
 			T=Front(Q);
