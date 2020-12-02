@@ -46,7 +46,7 @@ void InitCursorSpace(void)
 	int index;
 	for(index=0;index<SpaceSize;index++)
 	{
-		CursorSpace[index].ElementType=INT_MIN;
+		CursorSpace[index].Element=INT_MIN;
 		if(index<SpaceSize-1)
 			CursorSpace[index].Left=CursorSpace[index].Right=index+1;
 		else
