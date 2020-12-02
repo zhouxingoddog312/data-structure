@@ -5,9 +5,9 @@ int main(void)
 {
 	AvlTree T;
 	T=Init(T);
-	int Array[]={3,2,1,4,5,6,7};
+	int Array[]={2,1,4,5,9,3,6,7};
 	int i;
-	for(i=0;i<7;i++)
+	for(i=0;i<8;i++)
 	{
 		T=Insert(Array[i],T);
 	}
