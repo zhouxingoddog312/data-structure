@@ -78,13 +78,31 @@ static Position SingleRotateWithRight(Position K1)
 
 static Position DoubleRotateWithLeft(Position K3)
 {
-	K3->Left=SingleRotateWithRight(K3->Left);
-	return SingleRotateWithLeft(K3);
+	Position K1,K2;
+	K1=K3->Left;
+	K2=K1->Right;
+	K1->Right=K2->Left;
+	K3->Left=K2->Right;
+	K2->Left=K1;
+	K2->Right=K3;
+	K1->Height=Max(CatchHeight(K1->Left),CatchHeight(K1->Right))+1;
+	K3->Height=Max(CatchHeight(K3->Left),CatchHeight(K3->Right))+1;
+	K2->Height=Max(CatchHeight(K2->Left),CatchHeight(K2->Right))+1;
+	return K2;
 }
 static Position DoubleRotateWithRight(Position K1)
 {
-	K1->Right=SingleRotateWithLeft(K1->Right);
-	return SingleRotateWithRight(K1);
+	Position K2,K3;
+	K3=K1->Right;
+	K2=K3->Left;
+	K1->Right=K2->Left;
+	K3->Left=K2->Right;
+	K2->Left=K1;
+	K2->Right=K3;
+	K1->Height=Max(CatchHeight(K1->Left),CatchHeight(K1->Right))+1;
+	K3->Height=Max(CatchHeight(K3->Left),CatchHeight(K3->Right))+1;
+	K2->Height=Max(CatchHeight(K2->Left),CatchHeight(K2->Right))+1;
+	return K2;
 }
 AvlTree Delete(ElementType X,AvlTree T)
 {
