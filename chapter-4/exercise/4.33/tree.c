@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #include <stdlib.h>
 #include "tree.h"
 #include "queue.h"
@@ -7,8 +8,12 @@ struct TreeNode
 	ElementType Element;
 	SearchTree Left;
 	SearchTree Right;
+	int x;
+	int y;
 };
 
+static void FatalError(char *S);
+static void Error(char *S);
 static void FatalError(char *S)
 {
 	fputs("S\n",stdout);
@@ -17,10 +22,6 @@ static void FatalError(char *S)
 static void Error(char *S)
 {
 	puts(S);
-}
-static int Mid(int lower,int upper)
-{
-	return (lower+upper)/2;
 }
 
 SearchTree Init(SearchTree T)
@@ -192,30 +193,86 @@ void LevelOrder(SearchTree T)
 	}
 	Q=DisposeQueue(Q);
 }
-SearchTree MakeBalanceTree(int low,int up,SearchTree T)
+int NodeCount(SearchTree T)
 {
-	if(up>=low)
+	if(T!=NULL)
 	{
-		T=Insert(Mid(low,up),T);
-		if(up!=low)
+		return NodeCount(T->Left)+NodeCount(T->Right)+1;
+	}
+	else
+		return 0;
+}
+int LeafCount(SearchTree T)
+{
+	if(T==NULL)
+		return 0;
+	else if(T->Left==NULL && T->Right==NULL)
+		return 1;
+	return LeafCount(T->Left)+LeafCount(T->Right);
+}
+int FullNodeCount(SearchTree T)
+{
+	if(T==NULL)
+		return 0;
+	return (T->Left!=NULL && T->Right!=NULL)+FullNodeCount(T->Left)+FullNodeCount(T->Right);
+}
+
+SearchTree MakeRandomTree(int N)
+{
+	int index,Sum=0;
+	int array[N];
+	srand(time(0));
+	for(index=0;index<N;index++)
+		array[index]=0;
+	SearchTree T;
+	T=Init(T);
+	while(Sum<N)
+	{
+		index=rand()%N;
+		if(array[index]==0)
 		{
-			T->Left=MakeBalanceTree(low,Mid(low,up)-1,T->Left);
-			T->Right=MakeBalanceTree(Mid(low,up)+1,up,T->Right);
+			T=Insert(index+1,T);
+			array[index]=1;
+			Sum++;
 		}
 	}
 	return T;
 }
-void PrintInterval(ElementType low,ElementType up,SearchTree T)
+int Deep(Position P,SearchTree T)
 {
-	if(T!=NULL)
+	Position Temp=T;
+	int deep=0;
+	while(Temp!=P)
 	{
-		if(T->Element>=low)
-			PrintInterval(low,up,T->Left);
-		if(T->Element>=low&&T->Element<=up)
-		{
-			printf("%-5d",T->Element);
-		}
-		if(T->Element<=up)
-			PrintInterval(low,up,T->Right);
+		if(P->Element>Temp->Element)
+			Temp=Temp->Right;
+		else if(P->Element<Temp->Element)
+			Temp=Temp->Left;
+		deep++;
 	}
+	return deep;
+}
+int InsidePath(SearchTree T)
+{
+	SearchTree Temp=T;
+	int Sum=0;
+	Queue Q;
+	Q=CreateQueue(Q);
+	while(T!=NULL)
+	{
+		Sum+=Deep(T,Temp);
+		if(T->Left!=NULL)
+			Q=EnQueue(T->Left,Q);
+		if(T->Right!=NULL)
+			Q=EnQueue(T->Right,Q);
+		if(IsEmpty(Q))
+			T=NULL;
+		else
+		{
+			T=Front(Q);
+			Q=DeQueue(Q);
+		}
+	}
+	Q=DisposeQueue(Q);
+	return Sum;
 }
