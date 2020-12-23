@@ -21,7 +21,8 @@ static void CursorFree(Position P);
 
 static void FatalError(char *S)
 {
-	fputs("S\n",stdout);
+	fputs(S,stdout);
+	putchar('\n');
 	exit(EXIT_FAILURE);
 }
 static void Error(char *S)

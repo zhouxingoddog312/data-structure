@@ -16,7 +16,8 @@ static void FatalError(char *S);
 static void Error(char *S);
 static void FatalError(char *S)
 {
-	fputs("S\n",stdout);
+	fputs(S,stdout);
+	putchar('\n');
 	exit(EXIT_FAILURE);
 }
 static void Error(char *S)

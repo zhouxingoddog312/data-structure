@@ -33,11 +33,12 @@ static void MergeNode(Position P);
 
 static void Error(char *string)
 {
-	fputs("string\n",stderr);
+	puts(string);
 }
 static void FatalError(char *string)
 {
-	fputs("string\n",stderr);
+	fputs(string,stderr);
+	putchar('\n');
 	exit(EXIT_FAILURE);
 }
 static ElementType FindMin(Btree T)	//返回子树的最小元素

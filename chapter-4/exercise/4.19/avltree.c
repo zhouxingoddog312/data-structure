@@ -40,12 +40,13 @@ static Position DoubleRotateWithRight(Position K1);
 
 static void FatalError(char *string)
 {
-	fputs("string\n",stderr);
+	fputs(string,stderr);
+	putchar('\n');
 	exit(EXIT_FAILURE);
 }
 static void Error(char *string)
 {
-	fputs("string\n",stderr);
+	puts(string);
 }
 
 static int CatchHeight(Position P)

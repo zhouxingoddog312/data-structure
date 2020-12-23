@@ -13,7 +13,8 @@ static Position_Q MakeNode(ElementType_Q X);
 
 static void FatalError(char *string)
 {
-	fputs("string\n",stderr);
+	fputs(string,stderr);
+	putchar('\n');
 	exit(EXIT_FAILURE);
 }
 static Position_Q MakeNode(ElementType_Q X)

@@ -26,7 +26,8 @@ static int Deep(Position P,SplayTree T);
 
 static void FatalError(char *string)
 {
-	fputs("string\n",stderr);
+	fputs(string,stderr);
+	putchar('\n');
 	exit(EXIT_FAILURE);
 }
 static Position MakeNode(ElementType X)

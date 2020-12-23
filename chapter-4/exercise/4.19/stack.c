@@ -14,11 +14,13 @@ static void Error(char *S);
 static void FatalError(char *S)
 {
         fputs(S,stderr);
+	putchar('\n');
         exit(EXIT_FAILURE);
 }
 static void Error(char *S)
 {
         fputs(S,stderr);
+	putchar('\n');
 }
 
 int StackIsEmpty(Stack S)
