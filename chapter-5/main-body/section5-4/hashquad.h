@@ -1,5 +1,6 @@
-#ifndef _Hashline_H
-#define _Hashline_H
+#ifndef _HashQuad__H
+#define _HashQuad_H
+#define MinTableSize 3
 typedef unsigned int Index;
 typedef Index Position;
 typedef char *ElementType;
@@ -9,7 +10,7 @@ HashTable InitializeTable(int TableSize);
 void MakeEmpty(HashTable H);
 void DestroyTable(HashTable H);
 Position Find(ElementType Key,HashTable H);
-void Insert(ElementType Key,HashTable H);
+HashTable Insert(ElementType Key,HashTable H);
 void Delete(ElementType Key,HashTable H);
 ElementType Retrieve(Position P,HashTable H);
 HashTable Rehash(HashTable H);
