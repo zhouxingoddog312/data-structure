@@ -125,7 +125,7 @@ HashTable Insert(ElementType Key,HashTable H)
 {
 	Position Pos;
 	Pos=Find(Key,H);
-	if(Pos==UINT_MAX)
+	if(Pos==UINT_MAX)	//由find的返回值判断表满了，插入失败，再散列
 	{
 		H=Rehash(H);
 		H=Insert(Key,H);
@@ -154,11 +154,11 @@ ElementType Retrieve(Position P,HashTable H)
 HashTable Rehash(HashTable H)
 {
 	HashTable OldTable=H;
-	H=InitializeTable(OldTable->TableSize*2);
+	H=InitializeTable(NextPrime(OldTable->TableSize*2));
 	for(Position index=0;index<OldTable->TableSize;index++)
 		if(OldTable->TheCells[index].info==Legitimate)
 			H=Insert(OldTable->TheCells[index].Element,H);
-	DestroyTable(OldTable);
+	DestroyTable(OldTable);	//销毁旧表
 	return H;
 }
 
