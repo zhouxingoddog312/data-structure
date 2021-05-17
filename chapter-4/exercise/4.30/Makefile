@@ -8,8 +8,9 @@ a.out:$(objects)
 	$(compile)
 %.d:%.c
 	@set -e;rm -f $@;cc -MM $<>$@.$$$$;sed 's,\($*\).o[ :]*,\1.o $@ : ,g' <$@.$$$$>$@;rm -f $@.$$$$
-
+ifneq ($(MAKECMDGOALS),cleanobjects)
 include $(objects:%.o=%.d)
+endif
 .PHONY:cleanall clean.d cleanobjects
 
 cleanall:clean.d cleanobjects

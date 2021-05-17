@@ -8,7 +8,9 @@ sources=test.c tree.c queue.c
 
 a.out:$(objects)
 	$(CC) -o a.out $(objects)
+ifneq ($(MAKECMDGOALS),cleano)
 include $(sources:.c=.d)
+endif
 %.d:%.c
 	@set -e;\
 	rm -f $@;\
