@@ -5,6 +5,7 @@ struct HeapStruct;
 typedef struct HeapStruct *PriorityQueue;
 
 PriorityQueue Initialize(int MaxElements);
+void BuildHeap(ElementType Data[],int Length,PriorityQueue H);
 void Destroy(PriorityQueue H);
 void MakeEmpty(PriorityQueue H);
 void Insert(ElementType X,PriorityQueue H);

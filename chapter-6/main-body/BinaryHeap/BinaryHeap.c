@@ -12,6 +12,7 @@ struct HeapStruct
 };
 static void FatalError(char *string);
 static void Error(char *string);
+static void PercolateDown(int index,ElementType Data[],int Length);
 
 static void FatalError(char *string)
 {
@@ -24,7 +25,25 @@ static void Error(char *string)
 	fputs(string,stderr);
 	putc('\n',stderr);
 }
-
+static void PercolateDown(int index,ElementType Data[],int Length)
+{
+	ElementType Temp;
+	int i,Child;
+	for(i=index;i*2<=Length;i=Child)
+	{
+		Child=i*2;
+		if(Child!=Length&&Data[Child]>Data[Child+1])
+			Child++;
+		if(Data[i]>Data[Child])
+		{
+			Temp=Data[i];
+			Data[i]=Data[Child];
+			Data[Child]=Temp;
+		}
+		else
+			break;
+	}
+}
 
 PriorityQueue Initialize(int MaxElements)
 {
@@ -41,6 +60,19 @@ PriorityQueue Initialize(int MaxElements)
 	H->Size=0;
 	H->Elements[0]=INT_MIN;
 	return H;
+}
+void BuildHeap(ElementType Data[],int Length,PriorityQueue H)
+{
+	if(!IsEmpty(H))
+	{
+		Error("Make PriorityQueue be initialized!");
+		return;
+	}
+	for(int index=1;index<=Length;index++)
+		H->Elements[index]=Data[index-1];
+	H->Size=Length;
+	for(int index=Length/2;index>0;index--)
+		PercolateDown(index,H->Elements,Length);
 }
 void Destroy(PriorityQueue H)
 {
