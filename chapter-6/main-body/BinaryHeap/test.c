@@ -2,11 +2,11 @@
 #include "BinaryHeap.h"
 int main(void)
 {
-	int arr[]={8,3,4,2,5};
+	int arr[]={31,41,59,26,53,58,97};
 	PriorityQueue H=Initialize(13);
-	BuildHeap(arr,5,H);
-	Insert(11,H);
-	printf("The minimum is %d\n",FindMin(H));
+	BuildHeap(arr,7,H);
+/*	for(i=0;i<13;i++)
+		printf("The minimum is %d\n",FindMin(H));	*/
 	while(!IsEmpty(H))
 		printf("Now,the minimum is %d\n",DeleteMin(H));
 	Destroy(H);
