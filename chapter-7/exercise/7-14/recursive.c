@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef int ElementType;
 void FataError(char *s)
 {
 	fputs(s,stderr);
@@ -45,4 +48,12 @@ void MergeSort(ElementType A[],int N)
 	}
 	else
 		FataError("No space for tmp array!");
+}
+int main(void)
+{
+	int arr[]={2,5,3};
+	MergeSort(arr,3);
+	for(int i=0;i<3;i++)
+		printf("%d ",arr[i]);
+	return 0;
 }
