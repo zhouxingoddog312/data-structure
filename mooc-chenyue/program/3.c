@@ -7,7 +7,7 @@ struct PolyNode
 	int coef;
 	int expon;
 	Polynomial next;
-}
+};
 Polynomial ReadPoly(void);
 Polynomial Add(Polynomial P1,Polynomial P2);
 Polynomial Mult(Polynomial P1,Polynomial P2);
@@ -15,7 +15,12 @@ void PrintPoly(Polynomial P);
 void Attach(int c,int e,Polynomial *pRear);
 int main(void)
 {
-
+	Polynomial P1,P2;
+	P1=ReadPoly();
+	P2=ReadPoly();
+	PrintPoly(Mult(P1,P2));
+	PrintPoly(Add(P1,P2));
+	return 0;
 }
 void Attach(int c,int e,Polynomial *pRear)
 {
@@ -24,7 +29,7 @@ void Attach(int c,int e,Polynomial *pRear)
 	tmp->coef=c;
 	tmp->expon=e;
 	tmp->next=NULL;
-	*pRear->next=tmp;
+	(*pRear)->next=tmp;
 	*pRear=tmp;
 }
 Polynomial ReadPoly(void)
@@ -40,9 +45,9 @@ Polynomial ReadPoly(void)
 		scanf("%d %d",&c,&e);
 		Attach(c,e,&Rear);
 	}
-	t=P;
-	p=P->next;
-	free(t);
+	tmp=P;
+	P=P->next;
+	free(tmp);
 	return P;
 }
 Polynomial Add(Polynomial P1,Polynomial P2)
@@ -84,4 +89,78 @@ Polynomial Add(Polynomial P1,Polynomial P2)
 	front=front->next;
 	free(tmp);
 	return front;
+}
+Polynomial Mult(Polynomial P1,Polynomial P2)
+{
+	Polynomial t1,t2,P,Rear,tmp;
+	int c,e;
+	if(!P1||!P2)
+		return NULL;
+	t1=P1;
+	t2=P2;
+	P=(Polynomial)malloc(sizeof(struct PolyNode));
+	P->next=NULL;
+	Rear=P;
+	while(t2)
+	{
+		Attach(t1->coef*t2->coef,t1->expon+t2->expon,&Rear);
+		t2=t2->next;
+	}
+	t1=t1->next;
+	while(t1)
+	{
+		t2=P2;
+		Rear=P;
+		while(t2)
+		{
+			c=t1->coef*t2->coef;
+			e=t1->expon+t2->expon;
+			while(Rear->next&&Rear->next->expon>e)
+				Rear=Rear->next;
+			if(Rear->next&&Rear->next->expon==e)
+			{
+				if(Rear->next->coef+c)
+					Rear->next->coef+=c;
+				else
+				{
+					tmp=Rear->next;
+					Rear->next=tmp->next;
+					free(tmp);
+				}
+			}
+			else
+			{
+				tmp=(Polynomial)malloc(sizeof(struct PolyNode));
+				tmp->coef=c;
+				tmp->expon=e;
+				tmp->next=Rear->next;
+				Rear->next=tmp;
+				Rear=Rear->next;
+			}
+			t2=t2->next;
+		}
+		t1=t1->next;
+	}
+	tmp=P;
+	P=P->next;
+	free(tmp);
+	return P;
+}
+void PrintPoly(Polynomial P)
+{
+	int flag=0;
+	if(!P)
+	{
+		printf("0 0");
+	}
+	while(P)
+	{
+		if(!flag)
+			flag=1;
+		else
+			printf(" ");
+		printf("%d %d",P->coef,P->expon);
+		P=P->next;
+	}
+	printf("\n");
 }
