@@ -44,7 +44,7 @@ static void PercolateDown(int index,ElementType Data[],int Length)
 	for(i=index;i*2<=Length;i=Child)
 	{
 		Child=i*2;
-		if(Child!=Length&&Data[Child]>Data[Child+1])
+		if((Child!=Length)&&(Data[Child]>Data[Child+1]))
 			Child++;
 		if(Data[i]>Data[Child])
 		{
@@ -131,7 +131,7 @@ ElementType DeleteMin(PriorityQueue H)
 	for(i=1;i*2<=H->Size;i=child)
 	{
 		child=i*2;
-		if(child!=H->Size&&H->Elements[child]>H->Elements[child+1])
+		if((child!=H->Size)&&(H->Elements[child]>H->Elements[child+1]))
 			child++;
 		if(LastElement>H->Elements[child])
 			H->Elements[i]=H->Elements[child];
@@ -169,7 +169,8 @@ int main(void)
 		int OriginData[heap_node_count];
 		for(index=0;index<heap_node_count;index++)
 			scanf("%d",&OriginData[index]);
-		BuildHeap(OriginData,heap_node_count,H);
+		for(index=0;index<heap_node_count;index++)
+			Insert(OriginData[index],H);
 		for(print_count=0;print_count<path_count;print_count++)
 		{
 			scanf("%d",&temp_index);
