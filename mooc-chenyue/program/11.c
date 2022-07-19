@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #define MaxSize 1100
 int OriginData[MaxSize];
 int CompleteTree[MaxSize];
@@ -14,12 +15,12 @@ int LeftSubTreeCount(int totalnode)
 	int leftnode;
 	int bottomlevelnode,upperlevelnode;
 	height=(int)log2(totalnode)+1;
-	upperlevelnode=(pow(2,height-1)-2)/2;
-	bottomlevelnode=totalnode-(pow(2,height-1)-1);
+	upperlevelnode=(int)((pow(2,height-1)-2)/2);
+	bottomlevelnode=totalnode-(int)(pow(2,height-1)-1);
 	if(bottomlevelnode<=(pow(2,height-1)/2))
 		leftnode=upperlevelnode+bottomlevelnode;
 	else
-		leftnode=upperlevelnode+(pow(2,height-1)/2);
+		leftnode=upperlevelnode+(int)(pow(2,height-1)/2);
 	return leftnode;
 }
 void CreateTree(int left,int right,int root)
@@ -32,13 +33,16 @@ void CreateTree(int left,int right,int root)
 	CompleteTree[root]=OriginData[left+left_subtree_count];
 	leftroot=root*2+1;
 	rightroot=leftroot+1;
-	CreateTree(left,left+tree_node_count-1,leftroot);
-	CreateTree(left+tree_node_count+1,right,rightroot);
+	CreateTree(left,left+left_subtree_count-1,leftroot);
+	CreateTree(left+left_subtree_count+1,right,rightroot);
 }
 int main(void)
 {
+	char ch;
 	int N,index;
 	scanf("%d",&N);
+	while((ch=getchar())!='\n')
+		;
 	for(index=0;index<N;index++)
 		scanf("%d",&OriginData[index]);
 	qsort(OriginData,N,sizeof(int),compare);
