@@ -65,12 +65,12 @@ void Union(int val1,int val2)
 	root2=Find(val2);
 	if(Array[root1]>Array[root2])
 	{
-		Array[root2]=Array[root1]+Array[root2];
 		Array[root1]=root2;
 	}
 	else if(Array[root1]<=Array[root2])
 	{
-		Array[root1]=Array[root1]+Array[root2];
+		if(Array[root1]==Array[root2])
+			Array[root1]--;
 		Array[root2]=root1;
 	}
 }
