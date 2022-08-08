@@ -1,4 +1,6 @@
+#include <stdio.h>
 #define Cutoff (3)
+#define ElementType int
 void Swap(ElementType *A1,ElementType *A2)
 {
 	ElementType Tmp;
@@ -58,4 +60,21 @@ void Qsort(ElementType A[],int Left,int Right)
 void QuickSort(ElementType A[],int N)
 {
 	Qsort(A,0,N-1);
+}
+int main(void)
+{
+	int N,i;
+	scanf("%d\n",&N);
+	int array[N];
+	for(i=0;i<N;i++)
+		scanf("%d",&array[i]);
+	QuickSort(array,N);
+	for(i=0;i<N;i++)
+	{
+		if(i<N-1)
+			printf("%d ",array[i]);
+		else
+			printf("%d",array[i]);
+	}
+	return 0;
 }
